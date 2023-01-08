@@ -1,4 +1,4 @@
-package com.example.gs_expansion_flutter
+package com.example.almost_zenly
 
 import io.flutter.embedding.android.FlutterActivity
 

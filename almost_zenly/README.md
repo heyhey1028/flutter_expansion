@@ -1,4 +1,4 @@
-# gs_expansion_flutter
+# almost_zenly
 
 A new Flutter project.
 

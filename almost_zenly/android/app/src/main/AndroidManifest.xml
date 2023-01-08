@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.gs_expansion_flutter">
+    package="com.example.almost_zenly">
    <application
-        android:label="gs_expansion_flutter"
+        android:label="almost_zenly"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
