@@ -4,6 +4,13 @@
         android:label="almost_zenly"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+        <meta-data android:name="com.google.android.geo.AIzaSyBdw1X-PIrpF1S5jexu-y3Yg8d-Ybawz1o"
+               android:value="AIzaSyBdw1X-PIrpF1S5jexu-y3Yg8d-Ybawz1o"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
