@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "412561740140",
+    "project_id": "gs-expansion-flutter",
+    "storage_bucket": "gs-expansion-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412561740140:android:2add5dd057d2d878e82349",
+        "android_client_info": {
+          "package_name": "com.example.almost_zenly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "412561740140-imr9p4dvt7teg0gdo0m2189ac8153ver.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaQ0wx6vTLBgfTfaF_sBI26nrCZSYMnuY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "412561740140-imr9p4dvt7teg0gdo0m2189ac8153ver.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
