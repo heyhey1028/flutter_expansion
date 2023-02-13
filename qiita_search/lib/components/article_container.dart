@@ -68,46 +68,42 @@ class ArticleContainer extends StatelessWidget {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.favorite,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        article.likesCount.toString(),
+                        style: const TextStyle(
+                          fontSize: 12,
                           color: Colors.white,
                         ),
-                        Text(
-                          article.likesCount.toString(),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      CircleAvatar(
+                        radius: 26,
+                        backgroundImage: NetworkImage(article.user.iconUrl),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        article.user.id,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
-                    const Spacer(),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundImage: NetworkImage(article.user.iconUrl),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          article.user.id,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               )
             ],
           ),

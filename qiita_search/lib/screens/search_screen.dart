@@ -25,8 +25,6 @@ class _SearchScreenState extends State<SearchScreen> {
         title: const Text('Qiita Search'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -58,15 +56,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   .map((article) => ArticleContainer(article: article))
                   .toList(),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
   Future<List<Article>> searchQiita(String keyword) async {
-    print(keyword);
-
     final uri = Uri.https('qiita.com', '/api/v2/items', {
       'query': 'title:$keyword',
       'per_page': '10',
@@ -77,7 +73,6 @@ class _SearchScreenState extends State<SearchScreen> {
       'Authorization': 'Bearer $token',
     });
 
-    print(res.statusCode);
     if (res.statusCode == 200) {
       // レスポンスをモデルクラスへ変換
       final List<dynamic> body = jsonDecode(res.body);
