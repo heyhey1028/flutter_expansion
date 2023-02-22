@@ -21,8 +21,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF55C500),
         ),
         textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white, //<-- SEE HERE
-              // displayColor: Colors.pinkAccent, //<-- SEE HERE
+              bodyColor: Colors.white,
             ),
       ),
       home: const SearchScreen(),
