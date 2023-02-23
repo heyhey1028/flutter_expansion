@@ -17,7 +17,7 @@ class _MapScreenState extends State<MapScreen> {
   late StreamSubscription<Position> positionStream;
 
   //初期位置
-  final CameraPosition _kGooglePlex = const CameraPosition(
+  final CameraPosition initialHachiko = const CameraPosition(
     target: LatLng(35.6591038, 139.70024),
     zoom: 17,
   );
@@ -27,8 +27,13 @@ class _MapScreenState extends State<MapScreen> {
     distanceFilter: 100,
   );
 
-  void _onMapCreated(GoogleMapController controller) {
+  Future<void> _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
+    if (currentPosition == null) {
+      return;
+    }
+    await mapController.moveCamera(CameraUpdate.newLatLng(
+        LatLng(currentPosition!.latitude, currentPosition!.longitude)));
   }
 
   @override
@@ -39,6 +44,7 @@ class _MapScreenState extends State<MapScreen> {
       if (permission == LocationPermission.denied) {
         await Geolocator.requestPermission();
       }
+      currentPosition = await Geolocator.getCurrentPosition();
     });
 
     //現在位置を更新し続ける
@@ -65,9 +71,10 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
+        initialCameraPosition: initialHachiko,
         myLocationEnabled: true,
         onMapCreated: _onMapCreated,
+        myLocationButtonEnabled: false,
       ),
     );
   }
