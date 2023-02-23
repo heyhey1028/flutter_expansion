@@ -14,7 +14,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   http: ^0.13.5
-  webview_flutter: ^2.8.0
+  webview_flutter: ^3.0.4
   flutter_dotenv: ^5.0.2
   intl: ^0.18.0
 
