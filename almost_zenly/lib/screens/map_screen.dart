@@ -19,16 +19,29 @@ class _MapScreenState extends State<MapScreen> {
     zoom: 16.0,
   );
 
-  @override
-  void initState() {
-    //位置情報が許可されていない時に許可をリクエストする
-    Future(() async {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        await Geolocator.requestPermission();
-      }
-    });
-    super.initState();
+  Future<void> _onMapCreated(GoogleMapController controller) async {
+    mapController = controller;
+
+    // 位置情報の許可を求める
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+
+    // 現在地を取得
+    final Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // 現在地にカメラを移動
+    await mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 16.0,
+        ),
+      ),
+    );
   }
 
   @override
@@ -36,31 +49,9 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
-        onMapCreated: (GoogleMapController controller) {
-          mapController = controller;
-        },
+        onMapCreated: _onMapCreated,
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // 現在地を取得
-          final Position position = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high,
-          );
-
-          // 現在地を中心にカメラを移動
-          mapController.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: LatLng(position.latitude, position.longitude),
-                zoom: 16.0,
-              ),
-            ),
-          );
-        },
-        tooltip: 'current position',
-        child: const Icon(Icons.add),
       ),
     );
   }
