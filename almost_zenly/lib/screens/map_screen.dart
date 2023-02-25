@@ -11,9 +11,6 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  // GoogleMapを操作するためのクラス
-  late GoogleMapController mapController;
-
   // GoogleMap描画時の初期位置
   final CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(35.681236, 139.767125), // 東京駅
@@ -26,9 +23,6 @@ class _MapScreenState extends State<MapScreen> {
       // GoogleMapを表示する
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
-        onMapCreated: (GoogleMapController controller) {
-          mapController = controller;
-        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
