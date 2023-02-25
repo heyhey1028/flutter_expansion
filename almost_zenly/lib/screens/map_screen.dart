@@ -13,6 +13,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
+  Set<Marker> markers = {};
 
   final CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(35.681236, 139.767125),
@@ -32,7 +33,16 @@ class _MapScreenState extends State<MapScreen> {
     final Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
-
+    setState(() {
+      markers.add(Marker(
+        markerId: const MarkerId("my_location"),
+        position: LatLng(position.latitude, position.longitude),
+        draggable: true,
+        onDragEnd: (value) {
+          // value is the new position
+        },
+      ));
+    });
     // 現在地にカメラを移動
     await mapController.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -45,13 +55,19 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         onMapCreated: _onMapCreated,
-        myLocationEnabled: true,
         myLocationButtonEnabled: false,
+        markers: markers,
       ),
     );
   }
