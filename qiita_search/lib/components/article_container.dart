@@ -28,7 +28,7 @@ class ArticleContainer extends StatelessWidget {
           );
         },
         child: Container(
-          height: 180,
+          height: 200,
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 16,
@@ -41,7 +41,6 @@ class ArticleContainer extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 DateFormat('yyyy/MM/dd').format(article.createdAt),
