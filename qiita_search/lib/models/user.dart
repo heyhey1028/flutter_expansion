@@ -1,19 +1,16 @@
 class User {
-  final String name;
-  final String iconUrl;
   final String id;
+  final String iconUrl;
 
   User({
-    required this.name,
-    required this.iconUrl,
     required this.id,
+    required this.iconUrl,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      name: json['name'],
-      iconUrl: json['profile_image_url'],
       id: json['id'],
+      iconUrl: json['profile_image_url'],
     );
   }
 }
