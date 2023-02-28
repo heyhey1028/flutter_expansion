@@ -26,4 +26,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <!-- 位置情報の取得を求める -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>
