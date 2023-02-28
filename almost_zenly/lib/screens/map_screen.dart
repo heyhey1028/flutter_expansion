@@ -28,20 +28,23 @@ class _MapScreenState extends State<MapScreen> {
       await Geolocator.requestPermission();
     }
 
-    // 現在地を取得
-    final Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      // 現在地を取得
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
 
-    // 現在地にカメラを移動
-    await mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 16.0,
+      // 現在地にカメラを移動
+      await mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 16.0,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
