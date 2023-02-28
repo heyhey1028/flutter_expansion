@@ -33,6 +33,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     mapController.dispose();
+    // Streamを閉じる
     positionStream.cancel();
     super.dispose();
   }
@@ -93,6 +94,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _watchCurrentLocation() {
+    // 現在地を監視
     positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((position) async {
