@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
@@ -10,16 +11,19 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  // GoogleMap描画時の初期位置
+  final CameraPosition initialCameraPosition = const CameraPosition(
+    target: LatLng(35.681236, 139.767125), // 東京駅
+    zoom: 16.0,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Map Screen'),
+      // GoogleMapを表示する
+      body: GoogleMap(
+        initialCameraPosition: initialCameraPosition,
       ),
-      body: const Center(
-          child: Text(
-        'Let\'s build a map screen!',
-      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         tooltip: 'Increment',
