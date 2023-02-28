@@ -30,43 +30,69 @@ class _MapScreenState extends State<MapScreen> {
     distanceFilter: 0,
   );
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    mapController = controller;
+  @override
+  void dispose() {
+    mapController.dispose();
+    positionStream.cancel();
+    super.dispose();
+  }
 
-    // 位置情報の許可を求める
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GoogleMap(
+        initialCameraPosition: initialCameraPosition,
+        onMapCreated: (GoogleMapController controller) async {
+          mapController = controller;
+          await _requestPermission();
+          await _moveToCurrentLocation();
+          _watchCurrentLocation();
+        },
+        myLocationButtonEnabled: false,
+        markers: markers,
+      ),
+    );
+  }
+
+  Future<void> _requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
-
-    // 現在地を取得
-    final Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      markers.add(Marker(
-        markerId: const MarkerId("my_location"),
-        position: LatLng(position.latitude, position.longitude),
-        draggable: true,
-        onDragEnd: (value) {
-          // value is the new position
-        },
-      ));
-    });
-    // 現在地にカメラを移動
-    await mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 16.0,
-        ),
-      ),
-    );
-    // 現在地の更新を監視
-    watchCurrentLocation();
   }
 
-  void watchCurrentLocation() {
+  Future<void> _moveToCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      // 現在地を取得
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        markers.add(Marker(
+          markerId: const MarkerId("current_location"),
+          position: LatLng(
+            position.latitude,
+            position.longitude,
+          ),
+        ));
+      });
+
+      // 現在地にカメラを移動
+      await mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 16,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _watchCurrentLocation() {
     positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((position) async {
@@ -94,24 +120,5 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
     });
-  }
-
-  @override
-  void dispose() {
-    positionStream.cancel();
-    mapController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        onMapCreated: _onMapCreated,
-        myLocationButtonEnabled: false,
-        markers: markers,
-      ),
-    );
   }
 }
