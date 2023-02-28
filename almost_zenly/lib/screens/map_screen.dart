@@ -20,40 +20,6 @@ class _MapScreenState extends State<MapScreen> {
     zoom: 16.0,
   );
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    mapController = controller;
-
-    // 位置情報の許可を求める
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      await Geolocator.requestPermission();
-    }
-
-    // 現在地を取得
-    final Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      markers.add(Marker(
-        markerId: const MarkerId("my_location"),
-        position: LatLng(position.latitude, position.longitude),
-        draggable: true,
-        onDragEnd: (value) {
-          // value is the new position
-        },
-      ));
-    });
-    // 現在地にカメラを移動
-    await mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 16.0,
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     mapController.dispose();
@@ -65,10 +31,52 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
-        onMapCreated: _onMapCreated,
+        onMapCreated: (GoogleMapController controller) async {
+          mapController = controller;
+          await _requestPermission();
+          await _moveCurrentLocation();
+        },
         myLocationButtonEnabled: false,
         markers: markers,
       ),
     );
+  }
+
+  Future<void> _requestPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+  }
+
+  Future<void> _moveCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      // 現在地を取得
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        markers.add(Marker(
+          markerId: const MarkerId("my_location"),
+          position: LatLng(
+            position.latitude,
+            position.longitude,
+          ),
+        ));
+      });
+
+      // 現在地にカメラを移動
+      await mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 16.0,
+          ),
+        ),
+      );
+    }
   }
 }
