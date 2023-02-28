@@ -34,7 +34,7 @@ class _MapScreenState extends State<MapScreen> {
         onMapCreated: (GoogleMapController controller) async {
           mapController = controller;
           await _requestPermission();
-          await _moveCurrentLocation();
+          await _moveToCurrentLocation();
         },
         myLocationButtonEnabled: false,
         markers: markers,
@@ -49,7 +49,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  Future<void> _moveCurrentLocation() async {
+  Future<void> _moveToCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
@@ -60,7 +60,7 @@ class _MapScreenState extends State<MapScreen> {
 
       setState(() {
         markers.add(Marker(
-          markerId: const MarkerId("my_location"),
+          markerId: const MarkerId("current_location"),
           position: LatLng(
             position.latitude,
             position.longitude,
@@ -73,7 +73,7 @@ class _MapScreenState extends State<MapScreen> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
-            zoom: 16.0,
+            zoom: 16,
           ),
         ),
       );
