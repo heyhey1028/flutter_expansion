@@ -72,7 +72,7 @@ class _MapScreenState extends State<MapScreen> {
 
       setState(() {
         markers.add(Marker(
-          markerId: const MarkerId("current_location"),
+          markerId: const MarkerId('current_location'),
           position: LatLng(
             position.latitude,
             position.longitude,
@@ -99,10 +99,10 @@ class _MapScreenState extends State<MapScreen> {
       // マーカーの位置を更新
       setState(() {
         markers.removeWhere(
-            (marker) => marker.markerId == const MarkerId('my_location'));
+            (marker) => marker.markerId == const MarkerId('current_location'));
 
         markers.add(Marker(
-          markerId: const MarkerId("my_location"),
+          markerId: const MarkerId('current_location'),
           position: LatLng(position.latitude, position.longitude),
           draggable: true,
           onDragEnd: (value) {
