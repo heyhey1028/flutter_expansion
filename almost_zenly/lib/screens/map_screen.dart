@@ -19,15 +19,37 @@ class _MapScreenState extends State<MapScreen> {
     zoom: 16.0,
   );
 
-  Future<void> _onMapCreated(GoogleMapController controller) async {
-    mapController = controller;
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
 
-    // 位置情報の許可を求める
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GoogleMap(
+        initialCameraPosition: initialCameraPosition,
+        onMapCreated: (GoogleMapController controller) async {
+          mapController = controller;
+          await _requestPermission();
+          await _moveCurrentLocation();
+        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+      ),
+    );
+  }
+
+  Future<void> _requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
+  }
 
+  Future<void> _moveCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       // 現在地を取得
@@ -45,23 +67,5 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        onMapCreated: _onMapCreated,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false,
-      ),
-    );
   }
 }
