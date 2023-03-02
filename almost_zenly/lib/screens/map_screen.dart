@@ -105,11 +105,10 @@ class _MapScreenState extends State<MapScreen> {
 
         markers.add(Marker(
           markerId: const MarkerId('current_location'),
-          position: LatLng(position.latitude, position.longitude),
-          draggable: true,
-          onDragEnd: (value) {
-            // value is the new position
-          },
+          position: LatLng(
+            position.latitude,
+            position.longitude,
+          ),
         ));
       });
       // 現在地にカメラを移動
