@@ -4,16 +4,14 @@ class Article {
   final String title;
   final User user;
   final String url;
-  final String body;
+  final DateTime createdAt;
   final int likesCount;
   final List<String> tags;
-  final DateTime createdAt;
 
   Article({
     required this.title,
     required this.user,
     required this.url,
-    required this.body,
     required this.createdAt,
     this.likesCount = 0,
     this.tags = const [],
@@ -22,9 +20,8 @@ class Article {
   factory Article.fromJson(Map<String, dynamic> json) {
     return Article(
       title: json['title'],
-      url: json['url'],
       user: User.fromJson(json['user']),
-      body: json['body'],
+      url: json['url'],
       createdAt: DateTime.parse(json['created_at'].toString()),
       likesCount: json['likes_count'],
       tags: List<String>.from(json['tags'].map((tag) => tag['name'])),
