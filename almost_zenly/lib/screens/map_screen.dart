@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:almost_zenly/components/sign_in_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -51,6 +52,21 @@ class _MapScreenState extends State<MapScreen> {
         },
         myLocationButtonEnabled: false,
         markers: markers,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              builder: (BuildContext context) {
+                return const SignInModal();
+              });
+        },
+        label: const Text('LOGIN'),
       ),
     );
   }
