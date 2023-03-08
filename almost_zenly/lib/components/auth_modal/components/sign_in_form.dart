@@ -72,48 +72,41 @@ class _SignInFormState extends State<SignInForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CloseModalButton(),
-            const Text(
-              'Sign In',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CloseModalButton(),
+          const Text(
+            'Sign In',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
             ),
-            const AuthModalImage(),
-            AnimatedErrorMessage(errorMessage: errorMessage),
-            const SizedBox(height: 16.0),
-            AuthTextFormField(
-              controller: _emailController,
-              onChanged: (value) => _clearErrorMessage(),
-              validator: validateEmail,
-              labelText: 'Email',
-            ),
-            const SizedBox(height: 16.0),
-            AuthTextFormField(
-              controller: _passwordController,
-              obscureText: true,
-              onChanged: (value) => _clearErrorMessage(),
-              validator: validatePassword,
-              labelText: 'Password',
-            ),
-            const SizedBox(height: 16.0),
-            SubmitButton(
-              labelName: 'サインイン',
-              isLoading: isLoading,
-              onTap: () => _submit(context),
-            ),
-            TextButton(
-              onPressed: widget.onTapSwitch,
-              child: const Text('新規作成へ'),
-            ),
-            const SizedBox(height: 300.0),
-          ],
-        ),
+          ),
+          const AuthModalImage(),
+          AnimatedErrorMessage(errorMessage: errorMessage),
+          const SizedBox(height: 16.0),
+          AuthTextFormField(
+            controller: _emailController,
+            onChanged: (value) => _clearErrorMessage(),
+            validator: validateEmail,
+            labelText: 'Email',
+          ),
+          const SizedBox(height: 16.0),
+          AuthTextFormField(
+            controller: _passwordController,
+            obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
+            validator: validatePassword,
+            labelText: 'Password',
+          ),
+          const SizedBox(height: 16.0),
+          SubmitButton(
+            labelName: 'サインイン',
+            isLoading: isLoading,
+            onTap: () => _submit(context),
+          ),
+        ],
       ),
     );
   }

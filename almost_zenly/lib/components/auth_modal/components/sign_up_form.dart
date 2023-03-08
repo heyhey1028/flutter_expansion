@@ -83,57 +83,50 @@ class _SignUpFormState extends State<SignUpForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CloseModalButton(),
-            const Text(
-              'Sign Up',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CloseModalButton(),
+          const Text(
+            'Sign Up',
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 16.0),
-            const AuthModalImage(),
-            const SizedBox(height: 16.0),
-            AnimatedErrorMessage(errorMessage: errorMessage),
-            const SizedBox(height: 16.0),
-            AuthTextFormField(
-              controller: _emailController,
-              onChanged: (value) => _clearErrorMessage(),
-              validator: validateEmail,
-              labelText: 'Email',
-            ),
-            const SizedBox(height: 32.0),
-            AuthTextFormField(
-              controller: _passwordController,
-              obscureText: true,
-              onChanged: (value) => _clearErrorMessage(),
-              validator: validatePassword,
-              labelText: 'Password',
-            ),
-            const SizedBox(height: 32.0),
-            AuthTextFormField(
-              obscureText: true,
-              onChanged: (value) => _clearErrorMessage(),
-              validator: validateConfirmPassword,
-              labelText: 'Confirm Password',
-            ),
-            const SizedBox(height: 32.0),
-            SubmitButton(
-              labelName: '新規登録',
-              onTap: () => _submit(context),
-              isLoading: isLoading,
-            ),
-            TextButton(
-              onPressed: widget.onTapSwitch,
-              child: const Text('サインインへ'),
-            ),
-            const SizedBox(height: 300.0),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16.0),
+          const AuthModalImage(),
+          const SizedBox(height: 16.0),
+          AnimatedErrorMessage(errorMessage: errorMessage),
+          const SizedBox(height: 16.0),
+          AuthTextFormField(
+            controller: _emailController,
+            onChanged: (value) => _clearErrorMessage(),
+            validator: validateEmail,
+            labelText: 'Email',
+          ),
+          const SizedBox(height: 32.0),
+          AuthTextFormField(
+            controller: _passwordController,
+            obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
+            validator: validatePassword,
+            labelText: 'Password',
+          ),
+          const SizedBox(height: 32.0),
+          AuthTextFormField(
+            obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
+            validator: validateConfirmPassword,
+            labelText: 'Confirm Password',
+          ),
+          const SizedBox(height: 32.0),
+          SubmitButton(
+            labelName: '新規登録',
+            onTap: () => _submit(context),
+            isLoading: isLoading,
+          ),
+        ],
       ),
     );
   }
@@ -158,6 +151,8 @@ class _SignUpFormState extends State<SignUpForm> {
         _setErrorMessage('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
         _setErrorMessage('The account already exists for that email.');
+      } else {
+        _setErrorMessage('an unidentified error occurred while signing up.');
       }
     } finally {
       _setIsLoading(false);
