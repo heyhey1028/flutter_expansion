@@ -16,6 +16,7 @@ dependencies:
   google_maps_flutter: ^2.2.4
   geolocator: ^9.0.2
   firebase_core: ^2.7.0
+  firebase_auth: ^4.2.9
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +26,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

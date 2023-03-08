@@ -1,5 +1,5 @@
 import 'package:almost_zenly/firebase_options.dart';
-import 'package:almost_zenly/screens/map_screen.dart';
+import 'package:almost_zenly/screens/map_screen/map_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
