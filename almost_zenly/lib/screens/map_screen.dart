@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:almost_zenly/components/sign_in_modal.dart';
+import 'package:almost_zenly/components/auth_modal/auth_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -63,7 +63,7 @@ class _MapScreenState extends State<MapScreen> {
                 borderRadius: BorderRadius.circular(16.0),
               ),
               builder: (BuildContext context) {
-                return const SignInModal();
+                return const AuthModal();
               });
         },
         label: const Text('LOGIN'),
