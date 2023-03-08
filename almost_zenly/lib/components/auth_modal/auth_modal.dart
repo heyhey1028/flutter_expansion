@@ -13,7 +13,7 @@ class _AuthModalState extends State<AuthModal> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: const [
