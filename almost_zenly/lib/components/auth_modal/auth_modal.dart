@@ -1,3 +1,4 @@
+import 'package:almost_zenly/components/auth_modal/components/close_modal_button.dart';
 import 'package:almost_zenly/components/auth_modal/components/sign_in_form.dart';
 import 'package:almost_zenly/components/auth_modal/components/sign_up_form.dart';
 import 'package:flutter/material.dart';
@@ -31,17 +32,10 @@ class _AuthModalState extends State<AuthModal> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const CloseModalButton(),
                 modalType == AuthModalType.signIn
-                    ? SignInForm(
-                        onTapSwitch: () => setState(() {
-                          modalType = AuthModalType.signUp;
-                        }),
-                      )
-                    : SignUpForm(
-                        onTapSwitch: () => setState(() {
-                          modalType = AuthModalType.signIn;
-                        }),
-                      ),
+                    ? const SignInForm()
+                    : const SignUpForm(),
                 TextButton(
                   onPressed: switchModalType,
                   child: Text(buttonLabel),

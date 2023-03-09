@@ -1,7 +1,6 @@
 import 'package:almost_zenly/components/auth_modal/components/animated_error_message.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_modal_image.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_text_form_field.dart';
-import 'package:almost_zenly/components/auth_modal/components/close_modal_button.dart';
 import 'package:almost_zenly/components/auth_modal/components/submit_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +8,7 @@ import 'package:flutter/material.dart';
 class SignUpForm extends StatefulWidget {
   const SignUpForm({
     super.key,
-    required this.onTapSwitch,
   });
-
-  final VoidCallback onTapSwitch;
 
   @override
   State<SignUpForm> createState() => _SignUpFormState();
@@ -61,7 +57,6 @@ class _SignUpFormState extends State<SignUpForm> {
   // ---------  stateChages ---------
 
   void _setIsLoading(bool value) {
-    print('実行されてる？$value');
     setState(() {
       isLoading = value;
     });
@@ -86,7 +81,6 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CloseModalButton(),
           const Text(
             'Sign Up',
             style: TextStyle(
