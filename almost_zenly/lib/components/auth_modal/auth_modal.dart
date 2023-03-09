@@ -23,29 +23,30 @@ class _AuthModalState extends State<AuthModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      height: MediaQuery.of(context).size.height * 0.9,
-      child: GestureDetector(
-        onTap: () => unFocus(context),
-        child: Column(
-          children: [
-            const CloseModalButton(),
-            modalType == AuthModalType.signIn
-                ? const SignInForm()
-                : const SignUpForm(),
-            TextButton(
-              onPressed: switchModalType,
-              child: Text(buttonLabel),
-            ),
-          ],
+    return GestureDetector(
+      onTap: () => unFocus(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        height: MediaQuery.of(context).size.height * 0.9,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const CloseModalButton(),
+              modalType == AuthModalType.signIn
+                  ? const SignInForm()
+                  : const SignUpForm(),
+              TextButton(
+                onPressed: switchModalType,
+                child: Text(buttonLabel),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void unFocus(BuildContext context) {
-    print('叩かれてる？');
     final FocusScopeNode currentScope = FocusScope.of(context);
     if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
       FocusManager.instance.primaryFocus!.unfocus();
