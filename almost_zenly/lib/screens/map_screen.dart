@@ -66,7 +66,7 @@ class _MapScreenState extends State<MapScreen> {
                 return const AuthModal();
               });
         },
-        label: const Text('LOGIN'),
+        label: const Text('SIGN IN'),
       ),
     );
   }

@@ -15,10 +15,8 @@ class _AuthModalState extends State<AuthModal> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       height: MediaQuery.of(context).size.height * 0.9,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: const [
           CloseModalButton(),
-          Text('BottomSheet'),
         ],
       ),
     );
