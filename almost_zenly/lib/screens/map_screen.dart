@@ -42,6 +42,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         onMapCreated: (GoogleMapController controller) async {
