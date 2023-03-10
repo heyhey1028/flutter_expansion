@@ -45,8 +45,6 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void initState() {
-    // 現在ログイン済みか確認
-    _checkSignInState();
     // ログイン状態の変化を監視
     _watchSignInState();
     super.initState();
@@ -154,13 +152,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // ------------  Methods for Auth  ------------
-  void _checkSignInState() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      setIsSignedIn(true);
-    }
-  }
-
   void _watchSignInState() {
     setState(() {
       authUserStream =
