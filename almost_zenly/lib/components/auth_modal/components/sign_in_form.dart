@@ -68,6 +68,7 @@ class _SignInFormState extends State<SignInForm> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 16.0),
           AnimatedErrorMessage(errorMessage: errorMessage),
           const SizedBox(height: 16.0),
           AuthTextFormField(
@@ -126,6 +127,8 @@ class _SignInFormState extends State<SignInForm> {
         _setErrorMessage('No user found for that email.');
       } else if (e.code == 'wrong-password') {
         _setErrorMessage('Wrong password provided for that user.');
+      } else {
+        _setErrorMessage('Unidentified error occurred while signing in.');
       }
     }
     return null;

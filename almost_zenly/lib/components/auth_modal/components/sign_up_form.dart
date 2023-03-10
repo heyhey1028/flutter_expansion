@@ -78,6 +78,7 @@ class _SignUpFormState extends State<SignUpForm> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 16.0),
           AnimatedErrorMessage(errorMessage: errorMessage),
           const SizedBox(height: 16.0),
           AuthTextFormField(
@@ -141,7 +142,7 @@ class _SignUpFormState extends State<SignUpForm> {
       } else if (e.code == 'email-already-in-use') {
         _setErrorMessage('The account already exists for that email.');
       } else {
-        _setErrorMessage('an unidentified error occurred while signing up.');
+        _setErrorMessage('Unidentified error occurred while signing up.');
       }
     }
     return null;
