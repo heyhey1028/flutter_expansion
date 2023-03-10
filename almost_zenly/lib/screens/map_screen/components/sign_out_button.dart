@@ -4,11 +4,9 @@ class SignOutButton extends StatelessWidget {
   const SignOutButton({
     super.key,
     required this.onPressed,
-    this.isLoading = false,
   });
 
   final VoidCallback onPressed;
-  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
