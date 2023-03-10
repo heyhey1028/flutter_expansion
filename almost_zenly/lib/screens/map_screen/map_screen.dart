@@ -78,7 +78,7 @@ class _MapScreenState extends State<MapScreen> {
       floatingActionButton: !isSignedIn
           ? const SignInButton()
           : SignOutButton(
-              onPressed: () {},
+              onPressed: () => _signOut(),
             ),
     );
   }
@@ -163,5 +163,10 @@ class _MapScreenState extends State<MapScreen> {
         }
       });
     });
+  }
+
+  Future<void> _signOut() async {
+    await Future.delayed(const Duration(seconds: 1), () {});
+    await FirebaseAuth.instance.signOut();
   }
 }
