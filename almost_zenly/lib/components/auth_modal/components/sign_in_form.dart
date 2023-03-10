@@ -18,6 +18,7 @@ class _SignInFormState extends State<SignInForm> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String errorMessage = '';
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -55,6 +56,12 @@ class _SignInFormState extends State<SignInForm> {
     });
   }
 
+  void _setIsLoading(bool value) {
+    setState(() {
+      isLoading = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -88,6 +95,7 @@ class _SignInFormState extends State<SignInForm> {
           const SizedBox(height: 16.0),
           SubmitButton(
             labelName: 'サインイン',
+            isLoading: isLoading,
             onTap: () => _submit(context),
           ),
         ],
@@ -123,6 +131,7 @@ class _SignInFormState extends State<SignInForm> {
     required String password,
   }) async {
     try {
+      _setIsLoading(true);
       return await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -135,6 +144,8 @@ class _SignInFormState extends State<SignInForm> {
       } else {
         _setErrorMessage('Unidentified error occurred while signing in.');
       }
+    } finally {
+      _setIsLoading(false);
     }
     return null;
   }
