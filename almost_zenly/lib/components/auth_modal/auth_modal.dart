@@ -4,10 +4,8 @@ import 'package:almost_zenly/components/auth_modal/components/sign_up_form.dart'
 import 'package:flutter/material.dart';
 
 enum AuthModalType {
-  signIn(),
-  signUp();
-
-  const AuthModalType();
+  signIn,
+  signUp;
 }
 
 class AuthModal extends StatefulWidget {

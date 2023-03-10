@@ -54,7 +54,6 @@ class _SignUpFormState extends State<SignUpForm> {
     return Form(
       key: _formKey,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
             'Sign Up',
@@ -69,20 +68,20 @@ class _SignUpFormState extends State<SignUpForm> {
             validator: validateEmail,
             labelText: 'Email',
           ),
-          const SizedBox(height: 32.0),
+          const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _passwordController,
             obscureText: true,
             validator: validatePassword,
             labelText: 'Password',
           ),
-          const SizedBox(height: 32.0),
+          const SizedBox(height: 16.0),
           AuthTextFormField(
             obscureText: true,
             validator: validateConfirmPassword,
             labelText: 'Confirm Password',
           ),
-          const SizedBox(height: 32.0),
+          const SizedBox(height: 16.0),
           SubmitButton(
             labelName: '新規登録',
             onTap: () => _submit(context),

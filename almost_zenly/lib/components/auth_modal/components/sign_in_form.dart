@@ -44,7 +44,6 @@ class _SignInFormState extends State<SignInForm> {
     return Form(
       key: _formKey,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
             'Sign In',
