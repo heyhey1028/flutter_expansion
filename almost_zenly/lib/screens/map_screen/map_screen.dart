@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:almost_zenly/components/auth_modal/auth_modal.dart';
+import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
+import 'package:almost_zenly/screens/map_screen/components/sign_out_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -16,7 +18,6 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
-  // 現在地を監視するためのStream
   late StreamSubscription<Position> positionStream;
   Set<Marker> markers = {};
 
@@ -25,17 +26,38 @@ class _MapScreenState extends State<MapScreen> {
     zoom: 16.0,
   );
 
-  // 現在地通知の設定
   final LocationSettings locationSettings = const LocationSettings(
-    accuracy: LocationAccuracy.high, //正確性:highはAndroid(0-100m),iOS(10m)
+    accuracy: LocationAccuracy.high,
     distanceFilter: 0,
   );
+
+  // ------------  Auth  ------------
+  late StreamSubscription<User?> authUserStream;
+
+  // ------------  State changes  ------------
+  bool isLoggedIn = false;
+
+  void setIsLoggedIn(bool value) {
+    setState(() {
+      isLoggedIn = value;
+    });
+  }
+
+  @override
+  void initState() {
+    // 現在ログイン済みか確認
+    _checkLoginState();
+    // ログイン状態の変化を監視
+    _watchLoginState();
+    super.initState();
+  }
 
   @override
   void dispose() {
     mapController.dispose();
-    // Streamを閉じる
     positionStream.cancel();
+    // ログイン状態の監視を解放
+    authUserStream.cancel();
     super.dispose();
   }
 
@@ -55,20 +77,11 @@ class _MapScreenState extends State<MapScreen> {
         markers: markers,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              builder: (BuildContext context) {
-                return const AuthModal();
-              });
-        },
-        label: const Text('SIGN IN'),
-      ),
+      floatingActionButton: !isLoggedIn
+          ? const SignInButton()
+          : SignOutButton(
+              onPressed: () {},
+            ),
     );
   }
 
@@ -137,6 +150,27 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ),
       );
+    });
+  }
+
+  // ------------  Methods for Auth  ------------
+  void _checkLoginState() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setIsLoggedIn(true);
+    }
+  }
+
+  void _watchLoginState() {
+    setState(() {
+      authUserStream =
+          FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          setIsLoggedIn(false);
+        } else {
+          setIsLoggedIn(true);
+        }
+      });
     });
   }
 }
