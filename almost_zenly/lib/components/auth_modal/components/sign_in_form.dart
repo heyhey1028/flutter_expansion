@@ -97,11 +97,16 @@ class _SignInFormState extends State<SignInForm> {
 
   Future<void> _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      final user = await signIn(
+      // サインイン処理
+      final UserCredential? user = await signIn(
         email: _emailController.text,
         password: _passwordController.text,
       );
+
+      // 画面が破棄されている場合、後続処理を行わない
       if (!mounted) return;
+
+      // 500ミリ秒待って、モーダルを閉じる
       if (user != null) {
         Future.delayed(
           const Duration(milliseconds: 500),
