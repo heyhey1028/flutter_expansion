@@ -114,11 +114,16 @@ class _SignUpFormState extends State<SignUpForm> {
 
   Future<void> _submit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      final user = await signUp(
+      // サインアップ処理
+      final UserCredential? user = await signUp(
         email: _emailController.text,
         password: _passwordController.text,
       );
+
+      // 画面が破棄されている場合、後続処理を行わない
       if (!mounted) return;
+
+      // 500ミリ秒待って、モーダルを閉じる
       if (user != null) {
         Navigator.of(context).pop();
       }
