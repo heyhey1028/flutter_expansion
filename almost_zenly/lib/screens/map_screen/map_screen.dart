@@ -35,20 +35,20 @@ class _MapScreenState extends State<MapScreen> {
   late StreamSubscription<User?> authUserStream;
 
   // ------------  State changes  ------------
-  bool isLoggedIn = false;
+  bool isSignedIn = false;
 
-  void setIsLoggedIn(bool value) {
+  void setIsSignedIn(bool value) {
     setState(() {
-      isLoggedIn = value;
+      isSignedIn = value;
     });
   }
 
   @override
   void initState() {
     // 現在ログイン済みか確認
-    _checkLoginState();
+    _checkSignInState();
     // ログイン状態の変化を監視
-    _watchLoginState();
+    _watchSignInState();
     super.initState();
   }
 
@@ -77,7 +77,7 @@ class _MapScreenState extends State<MapScreen> {
         markers: markers,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: !isLoggedIn
+      floatingActionButton: !isSignedIn
           ? const SignInButton()
           : SignOutButton(
               onPressed: () {},
@@ -154,21 +154,21 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // ------------  Methods for Auth  ------------
-  void _checkLoginState() {
+  void _checkSignInState() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      setIsLoggedIn(true);
+      setIsSignedIn(true);
     }
   }
 
-  void _watchLoginState() {
+  void _watchSignInState() {
     setState(() {
       authUserStream =
           FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
-          setIsLoggedIn(false);
+          setIsSignedIn(false);
         } else {
-          setIsLoggedIn(true);
+          setIsSignedIn(true);
         }
       });
     });
