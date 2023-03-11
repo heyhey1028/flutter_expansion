@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "473779433136",
+    "project_id": "gs-expansion-test",
+    "storage_bucket": "gs-expansion-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473779433136:android:7e820b4a01b637fb5fd575",
+        "android_client_info": {
+          "package_name": "com.example.almost_zenly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473779433136-t6c2nk4jp5jj8dabogc58c4l9nq6s9k0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkFOq5jTkXFPOJbz1zFJSAL9Ca9Jtlth0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "473779433136-t6c2nk4jp5jj8dabogc58c4l9nq6s9k0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "473779433136-2cgflb0n1b0b31i2s3addmbbpg3j7gnm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.almostZenly"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
