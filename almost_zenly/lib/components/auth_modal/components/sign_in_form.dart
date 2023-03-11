@@ -1,5 +1,7 @@
+import 'package:almost_zenly/components/auth_modal/components/animated_error_message.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_text_form_field.dart';
 import 'package:almost_zenly/components/auth_modal/components/submit_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignInForm extends StatefulWidget {
@@ -15,6 +17,7 @@ class _SignInFormState extends State<SignInForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String errorMessage = '';
 
   @override
   void dispose() {
@@ -39,6 +42,19 @@ class _SignInFormState extends State<SignInForm> {
     return null;
   }
 
+  // ---------  StateChanges ---------
+  void _setErrorMessage(String message) {
+    setState(() {
+      errorMessage = message;
+    });
+  }
+
+  void _clearErrorMessage() {
+    setState(() {
+      errorMessage = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -53,8 +69,11 @@ class _SignInFormState extends State<SignInForm> {
             ),
           ),
           const SizedBox(height: 16.0),
+          AnimatedErrorMessage(errorMessage: errorMessage),
+          const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _emailController,
+            onChanged: (value) => _clearErrorMessage(),
             validator: validateEmail,
             labelText: 'Email',
           ),
@@ -62,6 +81,7 @@ class _SignInFormState extends State<SignInForm> {
           AuthTextFormField(
             controller: _passwordController,
             obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
             validator: validatePassword,
             labelText: 'Password',
           ),
@@ -76,6 +96,46 @@ class _SignInFormState extends State<SignInForm> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {}
+    if (_formKey.currentState!.validate()) {
+      // サインイン処理
+      final UserCredential? user = await signIn(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // 画面が破棄されている場合、後続処理を行わない
+      if (!mounted) return;
+
+      // 500ミリ秒待って、モーダルを閉じる
+      if (user != null) {
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          Navigator.of(context).pop,
+        );
+      }
+    }
+  }
+
+  // ---------  Sign In ---------
+
+  Future<UserCredential?> signIn({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      return await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _setErrorMessage('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        _setErrorMessage('Wrong password provided for that user.');
+      } else {
+        _setErrorMessage('Unidentified error occurred while signing in.');
+      }
+    }
+    return null;
   }
 }

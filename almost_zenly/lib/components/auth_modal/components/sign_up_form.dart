@@ -1,5 +1,7 @@
+import 'package:almost_zenly/components/auth_modal/components/animated_error_message.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_text_form_field.dart';
 import 'package:almost_zenly/components/auth_modal/components/submit_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUpForm extends StatefulWidget {
@@ -15,6 +17,7 @@ class _SignUpFormState extends State<SignUpForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String errorMessage = '';
 
   @override
   void dispose() {
@@ -49,6 +52,19 @@ class _SignUpFormState extends State<SignUpForm> {
     return null;
   }
 
+  // ---------  StateChanges ---------
+  void _setErrorMessage(String message) {
+    setState(() {
+      errorMessage = message;
+    });
+  }
+
+  void _clearErrorMessage() {
+    setState(() {
+      errorMessage = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -63,8 +79,11 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
           ),
           const SizedBox(height: 16.0),
+          AnimatedErrorMessage(errorMessage: errorMessage),
+          const SizedBox(height: 16.0),
           AuthTextFormField(
             controller: _emailController,
+            onChanged: (value) => _clearErrorMessage(),
             validator: validateEmail,
             labelText: 'Email',
           ),
@@ -72,12 +91,14 @@ class _SignUpFormState extends State<SignUpForm> {
           AuthTextFormField(
             controller: _passwordController,
             obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
             validator: validatePassword,
             labelText: 'Password',
           ),
           const SizedBox(height: 16.0),
           AuthTextFormField(
             obscureText: true,
+            onChanged: (value) => _clearErrorMessage(),
             validator: validateConfirmPassword,
             labelText: 'Confirm Password',
           ),
@@ -92,6 +113,43 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {}
+    if (_formKey.currentState!.validate()) {
+      // サインアップ処理
+      final UserCredential? user = await signUp(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // 画面が破棄されている場合、後続処理を行わない
+      if (!mounted) return;
+
+      // 500ミリ秒待って、モーダルを閉じる
+      if (user != null) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  // ---------  Sign Up ---------
+
+  Future<UserCredential?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      return await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        _setErrorMessage('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        _setErrorMessage('The account already exists for that email.');
+      } else {
+        _setErrorMessage('Unidentified error occurred while signing up.');
+      }
+    }
+    return null;
   }
 }
