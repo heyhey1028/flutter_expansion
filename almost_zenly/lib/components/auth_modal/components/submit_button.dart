@@ -1,3 +1,4 @@
+import 'package:almost_zenly/components/app_loading.dart';
 import 'package:flutter/material.dart';
 
 class SubmitButton extends StatelessWidget {
@@ -5,10 +6,12 @@ class SubmitButton extends StatelessWidget {
     super.key,
     required this.labelName,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String labelName;
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,7 @@ class SubmitButton extends StatelessWidget {
       height: 40,
       child: ElevatedButton(
         onPressed: onTap,
-        child: Text(labelName),
+        child: isLoading ? const AppLoading() : Text(labelName),
       ),
     );
   }
