@@ -27,8 +27,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Profile'),
       ),
-      body: FutureBuilder<AppUser?>(
-          future: _fetchAppUser(),
+      body: StreamBuilder<AppUser?>(
+          stream: _fetchAppUser(),
           builder: (context, snapshot) {
             final appUser = snapshot.data;
 
@@ -45,12 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: double.infinity,
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () async {
-                        await Navigator.of(context)
+                      onPressed: () {
+                        Navigator.of(context)
                             .push(MaterialPageRoute(builder: (context) {
                           return EditProfileScreen(user: appUser);
                         }));
-                        setState(() {});
                       },
                       child: const Text(
                         '編集',
@@ -101,27 +100,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<AppUser?> _fetchAppUser() async {
+  Stream<AppUser?> _fetchAppUser() {
     try {
       final userId = FirebaseAuth.instance.currentUser?.uid;
-      return await FirebaseFirestore.instance
+      return FirebaseFirestore.instance
           .collection('app_users')
           .doc(userId)
-          .get()
-          .then((DocumentSnapshot doc) {
-        if (doc.exists) {
-          return AppUser.fromDoc(
-            doc.id,
-            doc.data() as Map<String, dynamic>,
-          );
-        } else {
-          return AppUser();
-        }
-      });
+          .snapshots()
+          .map((snap) => AppUser.fromDoc(
+                snap.id,
+                snap.data() as Map<String, dynamic>,
+              ));
     } catch (e) {
       print(e);
     }
-    return null;
+    return const Stream.empty();
   }
 
   Future<void> _signOut(BuildContext context) async {
