@@ -2,6 +2,7 @@ import 'package:almost_zenly/components/auth_modal/components/animated_error_mes
 import 'package:almost_zenly/components/auth_modal/components/auth_modal_image.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_text_form_field.dart';
 import 'package:almost_zenly/components/auth_modal/components/submit_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -130,12 +131,14 @@ class _SignUpFormState extends State<SignUpForm> {
         password: _passwordController.text,
       );
 
-      // 画面が破棄されている場合、後続処理を行わない
-      if (!mounted) return;
-
       // 500ミリ秒待って、モーダルを閉じる
       if (user != null) {
-        Navigator.of(context).pop();
+        await createAppUser(user.user!.uid);
+        if (!mounted) return;
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          Navigator.of(context).pop,
+        );
       }
     }
   }
@@ -164,5 +167,13 @@ class _SignUpFormState extends State<SignUpForm> {
       _setIsLoading(false);
     }
     return null;
+  }
+
+  Future<void> createAppUser(String userId) async {
+    await FirebaseFirestore.instance.collection('app_users').doc(userId).set({
+      'name': 'your name please!',
+      'profile': 'your profile please!',
+      'image_type': 'lion',
+    });
   }
 }

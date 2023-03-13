@@ -37,6 +37,7 @@ class _AuthModalState extends State<AuthModal> {
                 onPressed: switchModalType,
                 child: Text(buttonLabel),
               ),
+              const SizedBox(height: 300)
             ],
           ),
         ),
