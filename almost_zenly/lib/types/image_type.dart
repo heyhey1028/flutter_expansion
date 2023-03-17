@@ -22,7 +22,7 @@ enum ImageType {
       case 'dog':
         return ImageType.dog;
       default:
-        return ImageType.unknown;
+        return ImageType.lion;
     }
   }
 
@@ -41,7 +41,7 @@ enum ImageType {
       case ImageType.dog:
         return 'assets/images/dog.png';
       default:
-        return 'assets/images/blank_person.png';
+        return 'assets/images/lion.png';
     }
   }
 }

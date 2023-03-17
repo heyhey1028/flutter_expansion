@@ -3,7 +3,7 @@ import 'package:almost_zenly/types/image_type.dart';
 class AppUser {
   AppUser({
     this.id,
-    this.imageType = ImageType.unknown,
+    this.imageType = ImageType.lion,
     this.name = '',
     this.profile = '',
   });
