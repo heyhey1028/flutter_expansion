@@ -4,8 +4,7 @@ enum ImageType {
   rabbit,
   monkey,
   panda,
-  dog,
-  unknown;
+  dog;
 
   static ImageType fromString(String type) {
     switch (type) {
