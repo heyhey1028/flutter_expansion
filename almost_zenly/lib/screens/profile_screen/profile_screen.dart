@@ -1,5 +1,6 @@
 import 'package:almost_zenly/components/app_loading.dart';
 import 'package:almost_zenly/models/app_user.dart';
+import 'package:almost_zenly/screens/profile_screen/edit_profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) {
-                          return Container();
+                          return EditProfileScreen(user: appUser);
                         }),
                       );
                     },
