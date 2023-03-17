@@ -26,55 +26,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Profile'),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              height: 40,
-              width: double.infinity,
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) {
-                      return Container();
-                    }),
-                  );
-                },
-                child: const Text(
-                  '編集',
-                  style: TextStyle(
-                    color: Colors.blue,
+      body: StreamBuilder<AppUser?>(
+        stream: _fetchAppUser(),
+        builder: (context, snapshot) {
+          final appUser = snapshot.data;
+
+          if (appUser == null) {
+            return const Center(child: AppLoading(color: Colors.blue));
+          }
+
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  width: double.infinity,
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) {
+                          return Container();
+                        }),
+                      );
+                    },
+                    child: const Text(
+                      '編集',
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            StreamBuilder(
-              stream: _fetchAppUser(),
-              builder: (
-                BuildContext context,
-                AsyncSnapshot snapshot,
-              ) {
-                final appUser = snapshot.data;
-
-                if (appUser == null) {
-                  return const Center(child: AppLoading());
-                }
-
-                return Expanded(
+                Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // アイコン画像
                         CircleAvatar(
                           radius: 100,
                           backgroundImage: AssetImage(appUser.imageType.path),
                           backgroundColor: Colors.transparent,
                         ),
                         const SizedBox(height: 20),
-                        // ユーザー名
                         Text(
                           appUser.name,
                           style: const TextStyle(
@@ -83,7 +79,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // プロフィール詳細
                         Text(
                           appUser.profile,
                           style: const TextStyle(fontSize: 18),
@@ -91,35 +86,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                );
-              },
+                ),
+                TextButton(
+                  onPressed: () => _signOut(context),
+                  child: isLoading
+                      ? const AppLoading(color: Colors.blue)
+                      : const Text('サインアウト'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => _signOut(context),
-              child: isLoading
-                  ? const AppLoading(color: Colors.blue)
-                  : const Text('サインアウト'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   Stream<AppUser?> _fetchAppUser() {
     try {
-      // ログイン中のユーザーのuidを取得
       final userId = FirebaseAuth.instance.currentUser?.uid;
-
-      // ドキュメントのストリームを取得
       return FirebaseFirestore.instance
           .collection('app_users')
           .doc(userId)
           .snapshots()
-          // ストリームの中身をAppUserクラスに変換
-          .map((doc) => AppUser.fromDoc(
-                doc.id,
-                doc.data()!,
+          .map((snap) => AppUser.fromDoc(
+                snap.id,
+                snap.data() as Map<String, dynamic>,
               ));
     } catch (e) {
       print(e);
