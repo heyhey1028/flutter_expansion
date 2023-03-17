@@ -46,7 +46,19 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text(datas.toString()),
+            // Text(datas.toString()),
+            StreamBuilder<dynamic>(
+              stream: getStream(),
+              builder: (
+                BuildContext context,
+                AsyncSnapshot<dynamic> snapshot,
+              ) {
+                if (snapshot.data == null) {
+                  return const Text('empty');
+                }
+                return Text(snapshot.toString());
+              },
+            ),
             ElevatedButton(
               onPressed: onPressed,
               child: const Text('push'),
@@ -60,6 +72,13 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> onPressed() async {
     final db = FirebaseFirestore.instance;
     final collectionRef = db.collection('users');
+    collectionRef.snapshots();
     // TODO: CRUD処理を実装していく
+  }
+
+  Stream<dynamic> getStream() {
+    Stream<dynamic> stream = const Stream.empty();
+    // TODO: streamを返す処理を実装する
+    return stream;
   }
 }
