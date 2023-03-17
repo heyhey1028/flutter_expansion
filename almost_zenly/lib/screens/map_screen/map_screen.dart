@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
-import 'package:almost_zenly/screens/map_screen/components/sign_out_button.dart';
+import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,17 +37,10 @@ class _MapScreenState extends State<MapScreen> {
 
   // ------------  State changes  ------------
   bool isSignedIn = false;
-  bool isLoading = false;
 
   void setIsSignedIn(bool value) {
     setState(() {
       isSignedIn = value;
-    });
-  }
-
-  void _setIsLoading(bool value) {
-    setState(() {
-      isLoading = value;
     });
   }
 
@@ -69,7 +63,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         onMapCreated: (GoogleMapController controller) async {
@@ -81,13 +75,16 @@ class _MapScreenState extends State<MapScreen> {
         myLocationButtonEnabled: false,
         markers: markers,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: !isSignedIn
+          ? FloatingActionButtonLocation.centerFloat
+          : FloatingActionButtonLocation.endTop,
       floatingActionButton: !isSignedIn
           ? const SignInButton()
-          : SignOutButton(
-              isLoading: isLoading,
-              onPressed: () => _signOut(),
-            ),
+          : ProfileButton(onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            }),
     );
   }
 
@@ -171,12 +168,5 @@ class _MapScreenState extends State<MapScreen> {
         }
       });
     });
-  }
-
-  Future<void> _signOut() async {
-    _setIsLoading(true);
-    await Future.delayed(const Duration(seconds: 1), () {});
-    await FirebaseAuth.instance.signOut();
-    _setIsLoading(false);
   }
 }
