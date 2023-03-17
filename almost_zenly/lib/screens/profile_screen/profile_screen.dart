@@ -1,6 +1,6 @@
 import 'package:almost_zenly/components/app_loading.dart';
 import 'package:almost_zenly/models/app_user.dart';
-import 'package:almost_zenly/screens/profile_screen/edit_profile_screen.dart';
+import 'package:almost_zenly/screens/profile_screen/components/edit_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -28,75 +28,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text('Profile'),
       ),
       body: StreamBuilder<AppUser?>(
-          stream: _fetchAppUser(),
-          builder: (context, snapshot) {
-            final appUser = snapshot.data;
+        stream: _fetchAppUser(),
+        builder: (context, snapshot) {
+          final appUser = snapshot.data;
 
-            if (appUser == null) {
-              return const Center(child: AppLoading(color: Colors.blue));
-            }
+          if (appUser == null) {
+            return const Center(child: AppLoading(color: Colors.blue));
+          }
 
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Container(
-                    height: 40,
-                    width: double.infinity,
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return EditProfileScreen(user: appUser);
-                        }));
-                      },
-                      child: const Text(
-                        '編集',
-                        style: TextStyle(
-                          color: Colors.blue,
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                EditButton(appUser: appUser),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 100,
+                          backgroundImage: AssetImage(appUser.imageType.path),
+                          backgroundColor: Colors.transparent,
                         ),
-                      ),
+                        const SizedBox(height: 20),
+                        Text(
+                          appUser.name,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          appUser.profile,
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircleAvatar(
-                            radius: 100,
-                            backgroundImage: AssetImage(appUser.imageType.path),
-                            backgroundColor: Colors.transparent,
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            appUser.name,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            appUser.profile,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => _signOut(context),
-                    child: isLoading
-                        ? const AppLoading(color: Colors.blue)
-                        : const Text('サインアウト'),
-                  ),
-                ],
-              ),
-            );
-          }),
+                ),
+                TextButton(
+                  onPressed: () => _signOut(context),
+                  child: isLoading
+                      ? const AppLoading(color: Colors.blue)
+                      : const Text('サインアウト'),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
