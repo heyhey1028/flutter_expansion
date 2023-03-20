@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
 import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,6 +22,7 @@ class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   late StreamSubscription<Position> positionStream;
   Set<Marker> markers = {};
+  late StreamSubscription usersStream;
 
   final CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(35.681236, 139.767125),
@@ -29,7 +31,7 @@ class _MapScreenState extends State<MapScreen> {
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 0,
+    distanceFilter: 5,
   );
 
   // ------------  Auth  ------------
@@ -48,6 +50,7 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     // ログイン状態の変化を監視
     _watchSignInState();
+    _watchUsers();
     super.initState();
   }
 
@@ -57,23 +60,31 @@ class _MapScreenState extends State<MapScreen> {
     positionStream.cancel();
     // ログイン状態の監視を解放
     authUserStream.cancel();
+    usersStream.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        onMapCreated: (GoogleMapController controller) async {
-          mapController = controller;
-          await _requestPermission();
-          await _moveToCurrentLocation();
-          _watchCurrentLocation();
-        },
-        myLocationButtonEnabled: false,
-        markers: markers,
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: initialCameraPosition,
+            onMapCreated: (GoogleMapController controller) async {
+              mapController = controller;
+              await _requestPermission();
+              await _moveToCurrentLocation();
+              _watchCurrentLocation();
+            },
+            myLocationButtonEnabled: false,
+            markers: markers,
+          ),
+          // StreamBuilder(
+          //   stream: ,
+          //   builder: (BuildContext context, ){},),
+        ],
       ),
       floatingActionButtonLocation: !isSignedIn
           ? FloatingActionButtonLocation.centerFloat
@@ -144,6 +155,9 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ));
       });
+      // Firestoreに現在地を書き込む
+      await _updateUserLocationInFirestore(position);
+
       // 現在地にカメラを移動
       await mapController.animateCamera(
         CameraUpdate.newCameraPosition(
@@ -168,5 +182,46 @@ class _MapScreenState extends State<MapScreen> {
         }
       });
     });
+  }
+
+  void _watchUsers() {
+    usersStream = FirebaseFirestore.instance
+        .collection('app_users')
+        .snapshots()
+        .listen((snapshot) {
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        if (data['location'] != null) {
+          final geoPoint = data['location'] as GeoPoint;
+          final lat = geoPoint.latitude;
+          final lng = geoPoint.longitude;
+          setState(() {
+            if (markers
+                .where((m) => m.markerId == MarkerId(doc.id))
+                .isNotEmpty) {
+              markers.removeWhere(
+                (marker) => marker.markerId == MarkerId(doc.id),
+              );
+            }
+            markers.add(Marker(
+              markerId: MarkerId(doc.id),
+              position: LatLng(lat, lng),
+            ));
+          });
+        }
+      }
+    });
+  }
+
+  // Firestoreのユーザーデータに現在地を更新する関数
+  Future<void> _updateUserLocationInFirestore(Position position) async {
+    print('アップデートしています');
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    GeoPoint geoPoint = GeoPoint(position.latitude, position.longitude);
+
+    await FirebaseFirestore.instance
+        .collection('app_users')
+        .doc(userId)
+        .update({'location': geoPoint});
   }
 }
