@@ -2,9 +2,11 @@ import 'package:almost_zenly/components/auth_modal/components/animated_error_mes
 import 'package:almost_zenly/components/auth_modal/components/auth_modal_image.dart';
 import 'package:almost_zenly/components/auth_modal/components/auth_text_form_field.dart';
 import 'package:almost_zenly/components/auth_modal/components/submit_button.dart';
+import 'package:almost_zenly/types/image_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({
@@ -170,10 +172,24 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   Future<void> createAppUser(String userId) async {
-    await FirebaseFirestore.instance.collection('app_users').doc(userId).set({
-      'name': 'your name please!',
-      'profile': 'your profile please!',
-      'image_type': 'lion',
-    });
+    try {
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final GeoPoint geoPoint = GeoPoint(
+        position.latitude,
+        position.longitude,
+      );
+
+      await FirebaseFirestore.instance.collection('app_users').doc(userId).set({
+        'name': 'your name please!',
+        'profile': 'your profile please!',
+        'image_type': ImageType.lion,
+        'coordinate': geoPoint,
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }

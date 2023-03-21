@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:almost_zenly/models/app_user.dart';
+import 'package:almost_zenly/screens/map_screen/components/card_section.dart';
 import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
 import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
@@ -23,6 +25,7 @@ class _MapScreenState extends State<MapScreen> {
   late StreamSubscription<Position> positionStream;
   Set<Marker> markers = {};
   late StreamSubscription usersStream;
+  late Position currentUserPosition;
 
   final CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(35.681236, 139.767125),
@@ -36,6 +39,7 @@ class _MapScreenState extends State<MapScreen> {
 
   // ------------  Auth  ------------
   late StreamSubscription<User?> authUserStream;
+  String currentUserId = '';
 
   // ------------  State changes  ------------
   bool isSignedIn = false;
@@ -43,6 +47,12 @@ class _MapScreenState extends State<MapScreen> {
   void setIsSignedIn(bool value) {
     setState(() {
       isSignedIn = value;
+    });
+  }
+
+  void setCurrentUserId(String value) {
+    setState(() {
+      currentUserId = value;
     });
   }
 
@@ -58,7 +68,6 @@ class _MapScreenState extends State<MapScreen> {
   void dispose() {
     mapController.dispose();
     positionStream.cancel();
-    // ログイン状態の監視を解放
     authUserStream.cancel();
     usersStream.cancel();
     super.dispose();
@@ -69,6 +78,7 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
           GoogleMap(
             initialCameraPosition: initialCameraPosition,
@@ -78,12 +88,49 @@ class _MapScreenState extends State<MapScreen> {
               await _moveToCurrentLocation();
               _watchCurrentLocation();
             },
-            myLocationButtonEnabled: false,
+            myLocationButtonEnabled: true,
             markers: markers,
           ),
-          // StreamBuilder(
-          //   stream: ,
-          //   builder: (BuildContext context, ){},),
+          StreamBuilder(
+            stream: getAppUserStream(),
+            builder: (BuildContext context, snapshot) {
+              if (snapshot.hasData && isSignedIn) {
+                final users = snapshot.data!
+                    .where((user) => user.id != currentUserId)
+                    .where((user) => user.coordinate != null)
+                    .toList();
+
+                return CardSection(
+                  onPageChanged: (index) {
+                    //スワイプ後のページのお店を取得
+                    late GeoPoint coordinate;
+                    if (index == 0) {
+                      coordinate = GeoPoint(
+                        currentUserPosition.latitude,
+                        currentUserPosition.longitude,
+                      );
+                    } else {
+                      coordinate = users.elementAt(index - 1).coordinate!;
+                    }
+                    //スワイプ後のお店の座標までカメラを移動
+                    mapController.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: LatLng(
+                            coordinate.latitude,
+                            coordinate.longitude,
+                          ),
+                          zoom: 16.0,
+                        ),
+                      ),
+                    );
+                  },
+                  appUsers: users,
+                );
+              }
+              return Container();
+            },
+          ),
         ],
       ),
       floatingActionButtonLocation: !isSignedIn
@@ -99,6 +146,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  // ------------  Methods for Map  ------------
   Future<void> _requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -116,6 +164,8 @@ class _MapScreenState extends State<MapScreen> {
       );
 
       setState(() {
+        currentUserPosition = position;
+
         markers.add(Marker(
           markerId: const MarkerId('current_location'),
           position: LatLng(
@@ -144,6 +194,8 @@ class _MapScreenState extends State<MapScreen> {
             .listen((position) async {
       // マーカーの位置を更新
       setState(() {
+        currentUserPosition = position;
+
         markers.removeWhere(
             (marker) => marker.markerId == const MarkerId('current_location'));
 
@@ -177,35 +229,46 @@ class _MapScreenState extends State<MapScreen> {
           FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           setIsSignedIn(false);
+          markers.clear();
         } else {
           setIsSignedIn(true);
+          setCurrentUserId(user.uid);
         }
       });
     });
   }
 
+  // ------------  Methods for Firestore  ------------
+  Stream<List<AppUser>> getAppUserStream() {
+    return FirebaseFirestore.instance.collection('app_users').snapshots().map(
+          (snp) => snp.docs
+              .map((doc) => AppUser.fromDoc(doc.id, doc.data()))
+              .toList(),
+        );
+  }
+
   void _watchUsers() {
-    usersStream = FirebaseFirestore.instance
-        .collection('app_users')
-        .snapshots()
-        .listen((snapshot) {
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-        if (data['location'] != null) {
-          final geoPoint = data['location'] as GeoPoint;
-          final lat = geoPoint.latitude;
-          final lng = geoPoint.longitude;
+    usersStream = getAppUserStream().listen((users) {
+      final otherUsers =
+          users.where((user) => user.id != currentUserId).toList();
+      for (final user in otherUsers) {
+        if (user.coordinate != null && isSignedIn) {
+          final lat = user.coordinate!.latitude;
+          final lng = user.coordinate!.longitude;
           setState(() {
             if (markers
-                .where((m) => m.markerId == MarkerId(doc.id))
+                .where((m) => m.markerId == MarkerId(user.id!))
                 .isNotEmpty) {
               markers.removeWhere(
-                (marker) => marker.markerId == MarkerId(doc.id),
+                (marker) => marker.markerId == MarkerId(user.id!),
               );
             }
             markers.add(Marker(
-              markerId: MarkerId(doc.id),
+              markerId: MarkerId(user.id!),
               position: LatLng(lat, lng),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen,
+              ),
             ));
           });
         }
@@ -215,13 +278,16 @@ class _MapScreenState extends State<MapScreen> {
 
   // Firestoreのユーザーデータに現在地を更新する関数
   Future<void> _updateUserLocationInFirestore(Position position) async {
-    print('アップデートしています');
-    String userId = FirebaseAuth.instance.currentUser!.uid;
-    GeoPoint geoPoint = GeoPoint(position.latitude, position.longitude);
-
-    await FirebaseFirestore.instance
-        .collection('app_users')
-        .doc(userId)
-        .update({'location': geoPoint});
+    if (isSignedIn) {
+      await FirebaseFirestore.instance
+          .collection('app_users')
+          .doc(currentUserId)
+          .update({
+        'coordinate': GeoPoint(
+          position.latitude,
+          position.longitude,
+        ),
+      });
+    }
   }
 }

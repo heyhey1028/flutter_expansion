@@ -7,20 +7,20 @@ class AppUser {
     this.imageType = ImageType.lion,
     this.name = '',
     this.profile = '',
-    this.location,
+    this.coordinate,
   });
 
   final String? id;
   final ImageType imageType;
   final String name;
   final String profile;
-  final GeoPoint? location;
+  final GeoPoint? coordinate;
 
   factory AppUser.fromDoc(String id, Map<String, dynamic> json) => AppUser(
         id: id,
         imageType: ImageType.fromString(json['image_type']),
         name: json['name'],
         profile: json['profile'],
-        location: json['location'] as GeoPoint,
+        coordinate: json['coordinate'],
       );
 }
