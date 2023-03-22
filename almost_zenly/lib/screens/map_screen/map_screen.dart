@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
 import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -29,18 +30,24 @@ class _MapScreenState extends State<MapScreen> {
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 0,
+    distanceFilter: 20,
   );
 
   // ------------  Auth  ------------
   late StreamSubscription<User?> authUserStream;
-
-  // ------------  State changes  ------------
+  String currentUserId = '';
   bool isSignedIn = false;
 
+  // ------------  State changes  ------------
   void setIsSignedIn(bool value) {
     setState(() {
       isSignedIn = value;
+    });
+  }
+
+  void setCurrentUserId(String value) {
+    setState(() {
+      currentUserId = value;
     });
   }
 
@@ -144,12 +151,15 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ));
       });
+
+      // Firestoreに現在地を更新
+      await _updateUserLocationInFirestore(position);
       // 現在地にカメラを移動
       await mapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
-            zoom: 16.0,
+            zoom: await mapController.getZoomLevel(),
           ),
         ),
       );
@@ -163,10 +173,28 @@ class _MapScreenState extends State<MapScreen> {
           FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           setIsSignedIn(false);
+          setCurrentUserId('');
         } else {
           setIsSignedIn(true);
+          setCurrentUserId(user.uid);
         }
       });
     });
+  }
+
+  // ------------  Methods for Firestore  ------------
+
+  Future<void> _updateUserLocationInFirestore(Position position) async {
+    if (isSignedIn) {
+      await FirebaseFirestore.instance
+          .collection('app_users')
+          .doc(currentUserId)
+          .update({
+        'location': GeoPoint(
+          position.latitude,
+          position.longitude,
+        ),
+      });
+    }
   }
 }

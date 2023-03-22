@@ -5,6 +5,7 @@ import 'package:almost_zenly/components/auth_modal/components/submit_button.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({
@@ -170,10 +171,14 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   Future<void> createAppUser(String userId) async {
+    final Position position = await Geolocator.getCurrentPosition();
+    final GeoPoint location = GeoPoint(position.latitude, position.longitude);
+
     await FirebaseFirestore.instance.collection('app_users').doc(userId).set({
       'name': 'your name please!',
       'profile': 'your profile please!',
       'image_type': 'lion',
+      'location': location,
     });
   }
 }
