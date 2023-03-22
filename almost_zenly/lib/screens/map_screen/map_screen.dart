@@ -159,7 +159,7 @@ class _MapScreenState extends State<MapScreen> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
-            zoom: await mapController.getZoomLevel(),
+            zoom: 16.0,
           ),
         ),
       );
