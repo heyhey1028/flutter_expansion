@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:almost_zenly/models/app_user.dart';
 import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
 import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
@@ -38,6 +39,9 @@ class _MapScreenState extends State<MapScreen> {
   String currentUserId = '';
   bool isSignedIn = false;
 
+  // ------------  Users  ------------
+  late StreamSubscription<List<AppUser>> usersStream;
+
   // ------------  State changes  ------------
   void setIsSignedIn(bool value) {
     setState(() {
@@ -51,10 +55,19 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  void clearUserMarkers() {
+    setState(() {
+      markers.removeWhere(
+        (marker) => marker.markerId != const MarkerId('current_location'),
+      );
+    });
+  }
+
   @override
   void initState() {
-    // ログイン状態の変化を監視
     _watchSignInState();
+    // 他ユーザーのデータを監視
+    _watchUsers();
     super.initState();
   }
 
@@ -159,7 +172,7 @@ class _MapScreenState extends State<MapScreen> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
-            zoom: 16.0,
+            zoom: await mapController.getZoomLevel(),
           ),
         ),
       );
@@ -168,17 +181,17 @@ class _MapScreenState extends State<MapScreen> {
 
   // ------------  Methods for Auth  ------------
   void _watchSignInState() {
-    setState(() {
-      authUserStream =
-          FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user == null) {
-          setIsSignedIn(false);
-          setCurrentUserId('');
-        } else {
-          setIsSignedIn(true);
-          setCurrentUserId(user.uid);
-        }
-      });
+    authUserStream =
+        FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (user == null) {
+        setIsSignedIn(false);
+        setCurrentUserId('');
+        clearUserMarkers();
+      } else {
+        setIsSignedIn(true);
+        setCurrentUserId(user.uid);
+        await setUsers();
+      }
     });
   }
 
@@ -195,6 +208,66 @@ class _MapScreenState extends State<MapScreen> {
           position.longitude,
         ),
       });
+    }
+  }
+
+  Future<List<AppUser>> getAppUsers() async {
+    return await FirebaseFirestore.instance.collection('app_users').get().then(
+        (snps) => snps.docs
+            .map((doc) => AppUser.fromDoc(doc.id, doc.data()))
+            .toList());
+  }
+
+  Stream<List<AppUser>> getAppUsersStream() {
+    return FirebaseFirestore.instance.collection('app_users').snapshots().map(
+          (snp) => snp.docs
+              .map((doc) => AppUser.fromDoc(doc.id, doc.data()))
+              .toList(),
+        );
+  }
+
+  // ------------  Methods for Markers  ------------
+  void _watchUsers() {
+    usersStream = getAppUsersStream().listen((users) {
+      _setUserMarkers(users);
+    });
+  }
+
+  Future<void> setUsers() async {
+    await getAppUsers().then((users) {
+      _setUserMarkers(users);
+    });
+  }
+
+  void _setUserMarkers(List<AppUser> users) {
+    if (!isSignedIn) {
+      return;
+    }
+    // 自分以外のユーザーのリストを作成
+    final otherUsers = users.where((user) => user.id != currentUserId).toList();
+
+    // ユーザーのマーカーをセット
+    for (final user in otherUsers) {
+      if (user.location != null) {
+        final lat = user.location!.latitude;
+        final lng = user.location!.longitude;
+        setState(() {
+          if (markers
+              .where((m) => m.markerId == MarkerId(user.id!))
+              .isNotEmpty) {
+            markers.removeWhere(
+              (marker) => marker.markerId == MarkerId(user.id!),
+            );
+          }
+          markers.add(Marker(
+            markerId: MarkerId(user.id!),
+            position: LatLng(lat, lng),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+          ));
+        });
+      }
     }
   }
 }
