@@ -77,6 +77,7 @@ class _MapScreenState extends State<MapScreen> {
     positionStream.cancel();
     // ログイン状態の監視を解放
     authUserStream.cancel();
+    usersStream.cancel();
     super.dispose();
   }
 
