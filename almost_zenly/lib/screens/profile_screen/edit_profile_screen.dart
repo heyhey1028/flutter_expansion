@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:almost_zenly/components/app_loading.dart';
 import 'package:almost_zenly/models/app_user.dart';
-import 'package:almost_zenly/screens/profile_screen/components/image_type_grid_view.dart';
 import 'package:almost_zenly/types/image_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -21,25 +24,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late ImageType selectedImageType;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _profileController = TextEditingController();
+  String imageUrl = '';
   bool isLoading = false;
+  bool isImageLoading = false;
 
   @override
   void initState() {
-    selectedImageType = widget.user.imageType;
     _nameController.text = widget.user.name;
     _profileController.text = widget.user.profile;
+    imageUrl = widget.user.imageUrl;
     super.initState();
-  }
-
-  void _setImageType(ImageType imageType) {
-    setState(() {
-      selectedImageType = imageType;
-    });
   }
 
   void _setIsLoading(bool value) {
     setState(() {
       isLoading = value;
+    });
+  }
+
+  void _setIsImageLoading(bool value) {
+    setState(() {
+      isImageLoading = value;
+    });
+  }
+
+  void setImageUrl(String value) {
+    setState(() {
+      imageUrl = value;
     });
   }
 
@@ -58,9 +69,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   children: [
                     // アイコン画像
-                    ImageTypeGridView(
-                      selectedImageType: selectedImageType,
-                      onTap: _setImageType,
+                    GestureDetector(
+                      onTap: () => pickImage(widget.user.id!),
+                      child: CircleAvatar(
+                        radius: 100,
+                        backgroundImage: NetworkImage(imageUrl),
+                        foregroundColor: Colors.transparent,
+                        child: isImageLoading
+                            ? const AppLoading(
+                                color: Colors.blue,
+                              )
+                            : null,
+                      ),
                     ),
                     // ユーザー名のテキストフィールド
                     TextField(
@@ -97,6 +117,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'name': _nameController.text,
         'profile': _profileController.text,
         'image_type': selectedImageType.name,
+        'image_url': imageUrl,
       });
 
       await Future.delayed(const Duration(seconds: 1), () {
@@ -106,6 +127,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print(e);
     } finally {
       _setIsLoading(false);
+    }
+  }
+
+  // アップロード処理
+  Future<void> pickImage(String userId) async {
+    // 画像のソースを選択する
+    final source = await showModalBottomSheet<ImageSource?>(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera),
+            title: const Text('カメラ'),
+            onTap: () => Navigator.of(context).pop(ImageSource.camera),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text('ギャラリー'),
+            onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+          ),
+        ],
+      ),
+    );
+    if (source == null) {
+      return;
+    }
+
+    // imagePickerで画像を選択する
+    final pickerFile = await ImagePicker().pickImage(source: source);
+    if (pickerFile == null) {
+      return;
+    }
+    File file = File(pickerFile.path);
+
+    // 画像をアップロードする
+    try {
+      _setIsImageLoading(true);
+      final TaskSnapshot task = await FirebaseStorage.instance
+          .ref("users/${pickerFile.name}")
+          .putFile(file);
+      final url = await task.ref.getDownloadURL();
+      setImageUrl(url);
+    } catch (e) {
+      print(e);
+    } finally {
+      _setIsImageLoading(false);
     }
   }
 }
