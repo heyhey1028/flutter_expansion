@@ -70,7 +70,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         onMapCreated: (GoogleMapController controller) async {
@@ -168,17 +168,15 @@ class _MapScreenState extends State<MapScreen> {
 
   // ------------  Methods for Auth  ------------
   void _watchSignInState() {
-    setState(() {
-      authUserStream =
-          FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user == null) {
-          setIsSignedIn(false);
-          setCurrentUserId('');
-        } else {
-          setIsSignedIn(true);
-          setCurrentUserId(user.uid);
-        }
-      });
+    authUserStream =
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        setIsSignedIn(false);
+        setCurrentUserId('');
+      } else {
+        setIsSignedIn(true);
+        setCurrentUserId(user.uid);
+      }
     });
   }
 
