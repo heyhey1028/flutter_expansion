@@ -75,7 +75,6 @@ class _MapScreenState extends State<MapScreen> {
   void dispose() {
     mapController.dispose();
     positionStream.cancel();
-    // ログイン状態の監視を解放
     authUserStream.cancel();
     usersStream.cancel();
     super.dispose();
@@ -84,7 +83,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: GoogleMap(
         initialCameraPosition: initialCameraPosition,
         onMapCreated: (GoogleMapController controller) async {
