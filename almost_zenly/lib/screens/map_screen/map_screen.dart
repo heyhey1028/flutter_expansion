@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:almost_zenly/models/app_user.dart';
 import 'package:almost_zenly/screens/map_screen/components/profile_button.dart';
 import 'package:almost_zenly/screens/map_screen/components/sign_in_button.dart';
+import 'package:almost_zenly/screens/map_screen/components/user_card_list.dart';
 import 'package:almost_zenly/screens/profile_screen/profile_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,6 +24,7 @@ class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   late StreamSubscription<Position> positionStream;
   Set<Marker> markers = {};
+  late Position currentUserPosition;
 
   final CameraPosition initialCameraPosition = const CameraPosition(
     target: LatLng(35.681236, 139.767125),
@@ -84,16 +86,62 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        onMapCreated: (GoogleMapController controller) async {
-          mapController = controller;
-          await _requestPermission();
-          await _moveToCurrentLocation();
-          _watchCurrentLocation();
-        },
-        myLocationButtonEnabled: false,
-        markers: markers,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          GoogleMap(
+            initialCameraPosition: initialCameraPosition,
+            onMapCreated: (GoogleMapController controller) async {
+              mapController = controller;
+              await _requestPermission();
+              await _moveToCurrentLocation();
+              _watchCurrentLocation();
+            },
+            myLocationButtonEnabled: true,
+            markers: markers,
+          ),
+          StreamBuilder(
+            stream: getAppUsersStream(),
+            builder: (BuildContext context, snapshot) {
+              if (snapshot.hasData && isSignedIn) {
+                final users = snapshot.data!
+                    .where((user) => user.id != currentUserId)
+                    .where((user) => user.location != null)
+                    .toList();
+
+                return UserCardList(
+                  onPageChanged: (index) {
+                    //スワイプ後のユーザーの位置情報を取得
+                    late GeoPoint location;
+                    if (index == 0) {
+                      location = GeoPoint(
+                        currentUserPosition.latitude,
+                        currentUserPosition.longitude,
+                      );
+                    } else {
+                      location = users.elementAt(index - 1).location!;
+                    }
+                    //スワイプ後のユーザーの座標までカメラを移動
+                    mapController.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: LatLng(
+                            location.latitude,
+                            location.longitude,
+                          ),
+                          zoom: 16.0,
+                        ),
+                      ),
+                    );
+                  },
+                  appUsers: users,
+                );
+              }
+              // サインアウト時、ユーザーデータを未取得時に表示するwidget
+              return Container();
+            },
+          ),
+        ],
       ),
       floatingActionButtonLocation: !isSignedIn
           ? FloatingActionButtonLocation.centerFloat
@@ -153,6 +201,8 @@ class _MapScreenState extends State<MapScreen> {
             .listen((position) async {
       // マーカーの位置を更新
       setState(() {
+        currentUserPosition = position;
+
         markers.removeWhere(
             (marker) => marker.markerId == const MarkerId('current_location'));
 
