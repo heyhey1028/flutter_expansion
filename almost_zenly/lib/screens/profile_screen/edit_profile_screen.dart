@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:almost_zenly/components/app_loading.dart';
 import 'package:almost_zenly/models/app_user.dart';
-import 'package:almost_zenly/screens/profile_screen/components/image_type_grid_view.dart';
-import 'package:almost_zenly/types/image_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -18,28 +20,35 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late ImageType selectedImageType;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _profileController = TextEditingController();
+  String imageUrl = '';
+  bool isImageLoading = false;
   bool isLoading = false;
 
   @override
   void initState() {
-    selectedImageType = widget.user.imageType;
+    imageUrl = widget.user.imageUrl;
     _nameController.text = widget.user.name;
     _profileController.text = widget.user.profile;
     super.initState();
   }
 
-  void _setImageType(ImageType imageType) {
-    setState(() {
-      selectedImageType = imageType;
-    });
-  }
-
   void _setIsLoading(bool value) {
     setState(() {
       isLoading = value;
+    });
+  }
+
+  void _setIsImageLoading(bool value) {
+    setState(() {
+      isImageLoading = value;
+    });
+  }
+
+  void setImageUrl(String value) {
+    setState(() {
+      imageUrl = value;
     });
   }
 
@@ -58,9 +67,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   children: [
                     // アイコン画像
-                    ImageTypeGridView(
-                      selectedImageType: selectedImageType,
-                      onTap: _setImageType,
+                    // アイコン画像編集
+                    GestureDetector(
+                      onTap: () => pickImage(widget.user.id!),
+                      child: CircleAvatar(
+                        radius: 100,
+                        backgroundImage: NetworkImage(imageUrl),
+                        foregroundColor: Colors.transparent,
+                        child: isImageLoading
+                            ? const AppLoading(
+                                color: Colors.blue,
+                              )
+                            : null,
+                      ),
                     ),
                     // ユーザー名のテキストフィールド
                     TextField(
@@ -96,7 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           .update({
         'name': _nameController.text,
         'profile': _profileController.text,
-        'image_type': selectedImageType.name,
+        'imageUrl': imageUrl,
       });
 
       await Future.delayed(const Duration(seconds: 1), () {
@@ -106,6 +125,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print(e);
     } finally {
       _setIsLoading(false);
+    }
+  }
+
+  // アップロード処理
+  Future<void> pickImage(String userId) async {
+    // 1. 画像のソースを選択する
+    final source = await showModalBottomSheet<ImageSource?>(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera),
+            title: const Text('カメラ'),
+            onTap: () => Navigator.of(context).pop(ImageSource.camera),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text('ギャラリー'),
+            onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+          ),
+        ],
+      ),
+    );
+    // ※選択されずにモーダルを閉じた場合、後続処理を行わない
+    if (source == null) {
+      return;
+    }
+
+    // 2. imagePickerで画像を取得する
+    final pickerFile = await ImagePicker().pickImage(source: source);
+    if (pickerFile == null) {
+      return;
+    }
+    File file = File(pickerFile.path);
+
+    try {
+      _setIsImageLoading(true);
+
+      // 3. Cloud Storageに画像をアップロードする
+      final TaskSnapshot task = await FirebaseStorage.instance
+          .ref("users/${pickerFile.name}")
+          .putFile(file);
+
+      // 4. ダウンロードURLを取得する
+      final url = await task.ref.getDownloadURL();
+
+      // 5. 取得したURLを変数に代入
+      setImageUrl(url);
+    } catch (e) {
+      print(e);
+    } finally {
+      _setIsImageLoading(false);
     }
   }
 }

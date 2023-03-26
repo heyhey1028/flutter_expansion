@@ -1,26 +1,28 @@
-import 'package:almost_zenly/types/image_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+const String blankImage =
+    'https://firebasestorage.googleapis.com/v0/b/gs-expansion-test.appspot.com/o/unknown_person.png?alt=media';
 
 class AppUser {
   AppUser({
     this.id,
-    this.imageType = ImageType.lion,
     this.name = '',
     this.profile = '',
     this.location,
+    this.imageUrl = blankImage,
   });
 
   final String? id;
-  final ImageType imageType;
   final String name;
   final String profile;
   final GeoPoint? location;
+  final String imageUrl;
 
   factory AppUser.fromDoc(String id, Map<String, dynamic> json) => AppUser(
         id: id,
-        imageType: ImageType.fromString(json['image_type']),
         name: json['name'],
         profile: json['profile'],
         location: json['location'],
+        imageUrl: json['imageUrl'] ?? blankImage,
       );
 }
