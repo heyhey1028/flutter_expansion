@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http; // httpという変数を通して、ht
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:qiita_search202307/models/article.dart';
 
+import '../widgets/article_container.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -44,6 +46,7 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
+          const ArticleContainer(),
         ],
       ),
     );
