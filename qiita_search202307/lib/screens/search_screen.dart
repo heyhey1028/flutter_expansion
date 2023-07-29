@@ -46,7 +46,9 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          const ArticleContainer(),
+          ArticleContainer(
+            article: articles[0],
+          ),
         ],
       ),
     );
