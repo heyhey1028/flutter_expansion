@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http; // httpという変数を通して、httpパッケージにアクセス
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:qiita_search202307/models/article.dart';
+import 'package:qiita_search202307/models/user.dart';
 
 import '../widgets/article_container.dart';
 
@@ -46,8 +47,22 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          ArticleContainer(
-            article: articles[0],
+          // ArticleContainer(
+          //   article: Article(
+          //     title: 'テスト',
+          //     user: User(
+          //       id: 'qii-taro',
+          //       profileImageUrl: 'https://firebasestorage.googleapis.com/v0/b/gs-expansion-test.appspot.com/o/unknown_person.png?alt=media',
+          //     ),
+          //     createdAt: DateTime.now(),
+          //     tags: ['Flutter', 'dart'],
+          //     url: 'https://example.com',
+          //   ),
+          // ),
+          Expanded(
+            child: ListView(
+              children: articles.map((article) => ArticleContainer(article: article)).toList(),
+            ),
           ),
         ],
       ),

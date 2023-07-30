@@ -18,7 +18,6 @@ class ArticleContainer extends StatelessWidget {
         horizontal: 16,
       ),
       child: Container(
-        height: 180, // 高さを指定
         padding: const EdgeInsets.symmetric(
           // 内側の余白を指定
           horizontal: 20,
@@ -62,6 +61,7 @@ class ArticleContainer extends StatelessWidget {
               ),
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // ハートアイコンといいね数
