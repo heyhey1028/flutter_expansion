@@ -1,30 +1,25 @@
 name: qiita_search
 description: A new Flutter project.
-
-publish_to: "none"
-
-version: 1.0.0+1
+publish_to: 'none'
+version: 0.1.0
 
 environment:
-  sdk: ">=2.18.5 <3.0.0"
+  sdk: '>=3.0.2 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.2
-  http: ^0.13.5
-  webview_flutter: ^3.0.4
-  flutter_dotenv: ^5.0.2
-  intl: ^0.18.0
+  flutter_dotenv: ^5.1.0
+  http: ^1.1.0
+  intl: ^0.18.1
+  webview_flutter: ^4.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true
   assets:
-    - .env
+    - .env # <- 読み込める様に.envファイルを追加

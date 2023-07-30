@@ -1,16 +1,19 @@
 class User {
-  final String id;
-  final String iconUrl;
-
+  // コンストラクタ
   User({
     required this.id,
-    required this.iconUrl,
+    required this.profileImageUrl,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
+  // プロパティ
+  final String id;
+  final String profileImageUrl;
+
+  // JSONからUserを生成するファクトリコンストラクタ
+  factory User.fromJson(dynamic json) {
     return User(
-      id: json['id'],
-      iconUrl: json['profile_image_url'],
+      id: json['id'] as String,
+      profileImageUrl: json['profile_image_url'] as String,
     );
   }
 }
