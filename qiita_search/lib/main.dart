@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:qiita_search/screens/search_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // packageをインポート
 
+// main関数をFutureに変更
 Future<void> main() async {
-  await dotenv.load(fileName: '.env');
-  runApp(const MyApp());
+  await dotenv.load(fileName: '.env'); // .envファイルを読み込み
+  runApp(const MainApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
