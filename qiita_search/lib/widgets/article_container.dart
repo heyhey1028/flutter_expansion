@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qiita_search/models/article.dart';
-import 'package:qiita_search/screens/article_screen.dart';
 
-/// 自由にカスタマイズしてみてください
+import '../screens/article_screen.dart';
+
 class ArticleContainer extends StatelessWidget {
   const ArticleContainer({
     super.key,
@@ -16,8 +16,8 @@ class ArticleContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 16,
         vertical: 12,
+        horizontal: 16,
       ),
       child: GestureDetector(
         onTap: () {
@@ -28,21 +28,21 @@ class ArticleContainer extends StatelessWidget {
           );
         },
         child: Container(
-          height: 180,
           padding: const EdgeInsets.symmetric(
+            // 内側の余白を指定
             horizontal: 20,
             vertical: 16,
           ),
           decoration: const BoxDecoration(
-            color: Color(0xFF55C500),
+            color: Color(0xFF55C500), // 背景色を指定
             borderRadius: BorderRadius.all(
-              Radius.circular(32),
+              Radius.circular(32), // 角丸を設定
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // 投稿日
               Text(
                 DateFormat('yyyy/MM/dd').format(article.createdAt),
                 style: const TextStyle(
@@ -50,6 +50,7 @@ class ArticleContainer extends StatelessWidget {
                   fontSize: 12,
                 ),
               ),
+              // タイトル
               Text(
                 article.title,
                 maxLines: 2,
@@ -60,6 +61,7 @@ class ArticleContainer extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
+              // タグ
               Text(
                 '#${article.tags.join(' #')}',
                 style: const TextStyle(
@@ -69,8 +71,10 @@ class ArticleContainer extends StatelessWidget {
                 ),
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // ハートアイコンといいね数
                   Column(
                     children: [
                       const Icon(
@@ -86,12 +90,13 @@ class ArticleContainer extends StatelessWidget {
                       ),
                     ],
                   ),
+                  // 投稿者のアイコンと投稿者名
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       CircleAvatar(
                         radius: 26,
-                        backgroundImage: NetworkImage(article.user.iconUrl),
+                        backgroundImage: NetworkImage(article.user.profileImageUrl),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -104,7 +109,7 @@ class ArticleContainer extends StatelessWidget {
                     ],
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
