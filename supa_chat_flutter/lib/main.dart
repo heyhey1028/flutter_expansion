@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // packageをインポート
 
-void main() {
+Future<void> main() async {
+  // main関数をFutureに変更
+  await dotenv.load(fileName: '.env'); // .envファイルを読み込み
   runApp(const MainApp());
 }
 
