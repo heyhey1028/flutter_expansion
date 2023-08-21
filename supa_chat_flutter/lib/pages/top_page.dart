@@ -35,7 +35,6 @@ class _TopPageState extends State<TopPage> {
                   AppButton(
                     width: 80,
                     onPressed: () {
-                      // navigate to login page with push method
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const LoginPage(),
