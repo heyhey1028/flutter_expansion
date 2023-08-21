@@ -20,4 +20,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env # <--- Add this line
+    - .env
+    - images/
