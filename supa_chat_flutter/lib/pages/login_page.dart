@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supa_chat_flutter/pages/signup_page.dart';
 import 'package:supa_chat_flutter/widgets/app_logo.dart';
 import 'package:supa_chat_flutter/widgets/app_text_form_field.dart';
 
@@ -58,7 +59,13 @@ class _LoginPageState extends State<LoginPage> {
                     const Text("Don't have an account?"),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const SignupPage(),
+                          ),
+                        );
+                      },
                       child: const Text('Sign up'),
                     ),
                   ],

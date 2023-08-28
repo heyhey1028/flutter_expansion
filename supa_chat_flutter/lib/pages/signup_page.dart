@@ -3,6 +3,7 @@ import 'package:supa_chat_flutter/widgets/app_logo.dart';
 import 'package:supa_chat_flutter/widgets/app_text_form_field.dart';
 
 import '../widgets/app_button.dart';
+import 'login_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -62,7 +63,13 @@ class _SignupPageState extends State<SignupPage> {
                     const Text('Already have an account?'),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      },
                       child: const Text('Log in'),
                     ),
                   ],
