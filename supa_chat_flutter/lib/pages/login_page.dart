@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:supa_chat_flutter/pages/signup_page.dart';
 import 'package:supa_chat_flutter/widgets/app_logo.dart';
 import 'package:supa_chat_flutter/widgets/app_text_form_field.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../widgets/app_button.dart';
+import 'chat_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +15,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,15 +40,31 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Form(
+                Form(
+                  key: _formKey,
                   child: Column(
                     children: [
                       AppTextFormField(
+                        controller: _emailController,
                         labelText: 'Email address',
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Email address is required';
+                          }
+                          return null;
+                        },
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       AppTextFormField(
+                        controller: _passwordController,
                         labelText: 'Password',
+                        obscureText: true,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Password is required';
+                          }
+                          return null;
+                        },
                       ),
                     ],
                   ),
@@ -49,7 +72,24 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 24),
                 AppButton(
                   height: 48,
-                  onPressed: () async {},
+                  isLoading: _isLoading,
+                  onPressed: () async {
+                    if (!_formKey.currentState!.validate()) return;
+
+                    final result = await _login(
+                      context,
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
+
+                    if (result == null || !mounted) return;
+
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const ChatPage(),
+                      ),
+                    );
+                  },
                   text: 'Continue',
                 ),
                 const SizedBox(height: 24),
@@ -76,5 +116,29 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<dynamic> _login(
+    BuildContext context, {
+    required String email,
+    required String password,
+  }) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      return await Supabase.instance.client.auth.signInWithPassword(email: email, password: password);
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
