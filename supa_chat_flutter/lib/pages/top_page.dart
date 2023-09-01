@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:supa_chat_flutter/pages/signup_page.dart';
 import 'package:supa_chat_flutter/widgets/app_logo.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../widgets/app_button.dart';
+import 'chat_page.dart';
 import 'login_page.dart';
 
 class TopPage extends StatefulWidget {
@@ -13,6 +15,21 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const ChatPage(),
+          ),
+        );
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
