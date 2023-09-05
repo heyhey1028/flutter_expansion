@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supa_chat_flutter/widgets/app_drawer.dart';
+import 'package:supa_chat_flutter/widgets/message_text_field.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -16,8 +17,11 @@ class _ChatPageState extends State<ChatPage> {
         title: const Text('Chat Page'),
       ),
       drawer: const AppDrawer(),
-      body: const Center(
-        child: Text('Chat Page'),
+      body: const Column(
+        children: [
+          Spacer(),
+          MessageTextField(),
+        ],
       ),
     );
   }
