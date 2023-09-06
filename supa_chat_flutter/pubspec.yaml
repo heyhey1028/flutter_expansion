@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   flutter_dotenv: ^5.1.0
   supabase_flutter: ^1.10.12
+  chat_bubbles: ^1.4.1
+
 
 dev_dependencies:
   flutter_test:
