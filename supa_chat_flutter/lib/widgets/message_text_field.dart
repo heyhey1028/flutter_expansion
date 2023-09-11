@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class MessageTextField extends StatefulWidget {
-  const MessageTextField({super.key});
+  const MessageTextField({
+    super.key,
+    required this.onSubmitted,
+  });
+
+  final Function(String) onSubmitted;
 
   @override
   State<MessageTextField> createState() => _MessageTextFieldState();
@@ -86,7 +91,8 @@ class _MessageTextFieldState extends State<MessageTextField> {
           ),
           GestureDetector(
             onTap: () {
-              // TODO:メッセージ送信処理を後ほど追加
+              // 送信ボタンを押したら、onSubmittedを発火
+              widget.onSubmitted(messageController.text);
 
               // 送信後、入力欄を空にする
               messageController.clear();
