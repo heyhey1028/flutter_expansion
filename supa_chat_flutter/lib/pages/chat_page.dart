@@ -36,8 +36,10 @@ class _ChatPageState extends State<ChatPage> {
       drawer: const AppDrawer(),
       body: Column(
         children: [
-          const Expanded(
-            child: MessageList(),
+          Expanded(
+            child: MessageList(
+              roomId: room.id,
+            ),
           ),
           MessageTextField(
             onSubmitted: (message) async {

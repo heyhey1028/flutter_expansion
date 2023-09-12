@@ -89,6 +89,7 @@ class _MessageTextFieldState extends State<MessageTextField> {
               onTapOutside: (event) => FocusScope.of(context).unfocus(),
             ),
           ),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () {
               // 送信ボタンを押したら、onSubmittedを発火
