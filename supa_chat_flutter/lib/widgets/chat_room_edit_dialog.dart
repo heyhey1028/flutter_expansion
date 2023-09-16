@@ -31,6 +31,7 @@ class _ChatRoomEditDialogState extends State<ChatRoomEditDialog> {
       title: const Text('Edit Chat Room'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
             controller: _controller,
@@ -76,6 +77,7 @@ class _ChatRoomEditDialogState extends State<ChatRoomEditDialog> {
     required String newName,
   }) async {
     try {
+      throw Exception('これはエラーのテストです');
       final result = await Supabase.instance.client.from('chat_rooms').update({'room_name': newName}).eq('room_id', roomId).select();
       return ChatRoom.fromJson(result.first);
     } catch (e) {
