@@ -34,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat Page'),
+        title: Text(room.name),
       ),
       drawer: const AppDrawer(),
       body: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/chat_room.dart';
 
@@ -16,6 +17,7 @@ class ChatRoomEditDialog extends StatefulWidget {
 
 class _ChatRoomEditDialogState extends State<ChatRoomEditDialog> {
   late TextEditingController _controller;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -27,11 +29,26 @@ class _ChatRoomEditDialogState extends State<ChatRoomEditDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Edit Chat Room'),
-      content: TextField(
-        controller: _controller,
-        decoration: const InputDecoration(
-          labelText: 'Chat Room Name',
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              labelText: 'Chat Room Name',
+            ),
+          ),
+          if (errorMessage.isNotEmpty)
+            Text(
+              errorMessage,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 12,
+              ),
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
       ),
       actions: [
         TextButton(
@@ -42,11 +59,30 @@ class _ChatRoomEditDialogState extends State<ChatRoomEditDialog> {
         ),
         TextButton(
           onPressed: () async {
-            Navigator.of(context).pop();
+            final result = await updateChatRoom(
+              roomId: widget.room.id!,
+              newName: _controller.text,
+            );
+            if (context.mounted && result != null) Navigator.of(context).pop();
           },
           child: const Text('Save'),
         ),
       ],
     );
+  }
+
+  Future<ChatRoom?> updateChatRoom({
+    required String roomId,
+    required String newName,
+  }) async {
+    try {
+      final result = await Supabase.instance.client.from('chat_rooms').update({'room_name': newName}).eq('room_id', roomId).select();
+      return ChatRoom.fromJson(result.first);
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+      });
+      return null;
+    }
   }
 }
