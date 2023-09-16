@@ -18,8 +18,6 @@ class AppDrawerListTile extends StatelessWidget {
       leading: const Icon(Icons.comment),
       title: Text(room.name),
       onTap: () {
-        // ドロワーを閉じる
-        Navigator.pop(context);
         // チャットページを差し替える
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
