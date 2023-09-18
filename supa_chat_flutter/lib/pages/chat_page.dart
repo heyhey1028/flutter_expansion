@@ -35,6 +35,21 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(room.name),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final result = await deleteChatRoom(context, roomId: room.id!);
+              if (result != null && context.mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const ChatPage(),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.delete),
+          ),
+        ],
       ),
       drawer: const AppDrawer(),
       body: Column(
@@ -109,5 +124,23 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
     return;
+  }
+
+  Future<ChatRoom?> deleteChatRoom(
+    BuildContext context, {
+    required String roomId,
+  }) async {
+    try {
+      final result = await Supabase.instance.client.from('chat_rooms').delete().eq('room_id', roomId).select();
+      return ChatRoom.fromJson(result.first);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return null;
+    }
   }
 }
